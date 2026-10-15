@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#7d1028">
+<title>WAPPI • Penilaian Pengguna</title>
+<style>
+:root{--maroon:#7d1028;--maroon2:#a51d39;--gold:#ffc83d;--cream:#fff8e9;--ink:#24191b;--muted:#75666a;--green:#238747}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:linear-gradient(145deg,#fff8e9,#ffe9b0);color:var(--ink);min-height:100vh}
+header{background:var(--maroon);color:white;padding:20px 18px 22px;text-align:center;border-bottom:6px solid var(--gold)}
+.brand{font-weight:1000;letter-spacing:2px;font-size:clamp(32px,6vw,48px);line-height:1}.tag{color:var(--gold);font-weight:700;margin-top:7px;font-size:clamp(14px,2.8vw,19px)}.sub{margin-top:10px;font-size:14px;opacity:.95}
+main{max-width:850px;margin:0 auto;padding:18px 14px 36px}.progress-wrap{height:8px;background:#ead9d0;border-radius:20px;overflow:hidden;margin:0 0 16px}.progress{height:100%;width:0;background:var(--green);transition:width .2s}
+.card{background:white;border:2px solid #f1dca5;border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 7px 22px #4b1a2415;margin-bottom:15px}
+.step{color:var(--maroon);font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:1px}.question{font-size:clamp(21px,4vw,30px);font-weight:850;line-height:1.2;margin:9px 0 8px}.hint{color:var(--muted);font-size:15px;line-height:1.4;margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}.pick{border:2px solid #eadfe0;background:#fffdf9;border-radius:16px;min-height:94px;padding:10px 4px;font-size:14px;font-weight:750;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;touch-action:manipulation}.pick .emoji{font-size:30px}.pick.selected{border-color:var(--maroon);background:#fff0c5;box-shadow:inset 0 0 0 2px var(--maroon)}
+.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.opt{border:2px solid #eadfe0;background:#fffdf9;border-radius:14px;padding:16px 12px;text-align:left;font-size:16px;font-weight:700;min-height:58px;touch-action:manipulation}.opt.selected{border-color:var(--maroon);background:#fff0c5}
+textarea,input[type=text]{width:100%;border:2px solid #e4d5d6;border-radius:13px;padding:14px;font-size:17px;font-family:inherit;background:#fffdf9}textarea{min-height:110px;resize:vertical}
+.nav{display:flex;gap:10px;margin-top:15px}.btn{border:0;border-radius:14px;padding:16px 18px;font-size:17px;font-weight:850;touch-action:manipulation;min-height:56px}.primary{background:var(--maroon);color:white;flex:1}.secondary{background:white;color:var(--maroon);border:2px solid #e4c9ce}.small{font-size:13px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.5}
+.hidden{display:none!important}.center{text-align:center}.bigcheck{font-size:65px}.thank{font-size:clamp(27px,5vw,38px);font-weight:950;color:var(--maroon)}.adminbar{display:flex;gap:8px;flex-wrap:wrap}.adminbar button{flex:1}
+.summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{background:#fff5d8;border-radius:14px;padding:14px}.stat b{display:block;font-size:28px;color:var(--maroon)}
+footer{text-align:center;padding:0 14px 24px;font-size:12px;color:#79696b}
+@media(max-width:500px){.grid{gap:5px}.pick{min-height:83px;font-size:11px}.pick .emoji{font-size:25px}.options{grid-template-columns:1fr}.nav .btn{padding:14px 10px;font-size:15px}.card{border-radius:18px}}
+</style>
+</head>
+<body>
+<header><div class="brand">🌯 WAPPI</div><div class="tag">Gulung Rasa, Nikmati Khasiat!</div><div class="sub">PENILAIAN PENGGUNA • SP 2.5</div></header>
+<main>
+<div id="survey">
+  <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+  <section class="card" id="step0">
+    <div class="step">Selamat datang</div><div class="question">Bantu kami menambah baik WAPPI!</div>
+    <div class="hint">Sentuh skrin untuk memberikan penilaian anda. Maklum balas ini digunakan untuk menilai produk dan bahan promosi WAPPI. Penyertaan adalah sukarela.</div>
+    <div class="question" style="font-size:19px">Anda menilai…</div>
+    <div class="options" id="typeOpts">
+      <button class="opt selected" data-val="Produk WAPPI">🌯 Produk WAPPI</button>
+      <button class="opt" data-val="Poster / video promosi">📣 Poster / video promosi</button>
+      <button class="opt" data-val="Produk dan promosi">✨ Produk dan promosi</button>
+    </div>
+    <div class="nav"><button class="btn primary" onclick="go(1)">Mula menilai →</button></div>
+  </section>
+  <section class="card hidden" id="step1">
+    <div class="step">Soalan 1 daripada 5</div><div class="question">Apakah pendapat anda tentang WAPPI?</div><div class="hint">Pilih satu penilaian berdasarkan tanggapan keseluruhan anda.</div>
+    <div class="grid" data-key="overall">
+      <button class="pick" data-val="1"><span class="emoji">😟</span>Kurang baik</button>
+      <button class="pick" data-val="2"><span class="emoji">🙁</span>Biasa sahaja</button>
+      <button class="pick" data-val="3"><span class="emoji">😐</span>Sederhana</button>
+      <button class="pick" data-val="4"><span class="emoji">🙂</span>Menarik</button>
+      <button class="pick" data-val="5"><span class="emoji">🤩</span>Sangat menarik</button>
+    </div>
+    <div class="nav"><button class="btn secondary" onclick="go(0)">← Kembali</button><button class="btn primary" onclick="go(2)">Seterusnya →</button></div>
+  </section>
+  <section class="card hidden" id="step2">
+    <div class="step">Soalan 2 daripada 5</div><div class="question">Adakah bahan promosi mudah difahami?</div><div class="hint">Nilai kejelasan poster, slogan dan maklumat produk.</div>
+    <div class="options" data-key="promo">
+      <button class="opt" data-val="Sangat mudah difahami">😍 Sangat mudah difahami</button>
+      <button class="opt" data-val="Mudah difahami">🙂 Mudah difahami</button>
+      <button class="opt" data-val="Kurang jelas">😕 Kurang jelas</button>
+      <button class="opt" data-val="Tidak jelas">🙁 Tidak jelas</button>
+    </div>
+    <div class="nav"><button class="btn secondary" onclick="go(1)">← Kembali</button><button class="btn primary" onclick="go(3)">Seterusnya →</button></div>
+  </section>
+  <section class="card hidden" id="step3">
+    <div class="step">Soalan 3 daripada 5</div><div class="question">Apakah aspek yang paling anda suka?</div><div class="hint">Pilih satu aspek utama.</div>
+    <div class="options" data-key="favourite">
+      <button class="opt" data-val="Rasa / bahan">😋 Rasa / bahan</button>
+      <button class="opt" data-val="Maklumat pemakanan">🥬 Maklumat pemakanan</button>
+      <button class="opt" data-val="Harga">💰 Harga</button>
+      <button class="opt" data-val="Pembungkusan">📦 Pembungkusan</button>
+      <button class="opt" data-val="Reka bentuk promosi">🎨 Reka bentuk promosi</button>
+      <button class="opt" data-val="Lain-lain">⭐ Lain-lain</button>
+    </div>
+    <div class="nav"><button class="btn secondary" onclick="go(2)">← Kembali</button><button class="btn primary" onclick="go(4)">Seterusnya →</button></div>
+  </section>
+  <section class="card hidden" id="step4">
+    <div class="step">Soalan 4 daripada 5</div><div class="question">Adakah anda berminat untuk membeli atau mencuba WAPPI?</div><div class="hint">Pilih jawapan yang paling tepat.</div>
+    <div class="options" data-key="buy">
+      <button class="opt" data-val="Ya">👍 Ya</button>
+      <button class="opt" data-val="Mungkin">🤔 Mungkin</button>
+      <button class="opt" data-val="Tidak">👎 Tidak</button>
+    </div>
+    <div class="nav"><button class="btn secondary" onclick="go(3)">← Kembali</button><button class="btn primary" onclick="go(5)">Seterusnya →</button></div>
+  </section>
+  <section class="card hidden" id="step5">
+    <div class="step">Soalan 5 daripada 5</div><div class="question">Apakah cadangan anda untuk WAPPI?</div><div class="hint">Pilihan. Kongsikan idea perisa, harga, pembungkusan atau promosi.</div>
+    <textarea id="suggestion" placeholder="Taip cadangan anda di sini…"></textarea>
+    <div class="nav"><button class="btn secondary" onclick="go(4)">← Kembali</button><button class="btn primary" onclick="submitSurvey()">Hantar penilaian ✓</button></div>
+    <div class="small">Jangan masukkan maklumat peribadi atau sensitif.</div>
+  </section>
+  <section class="card hidden center" id="thanks">
+    <div class="bigcheck">🎉</div><div class="thank">Terima kasih!</div><p>Penilaian anda telah direkodkan pada peranti ini.</p>
+    <p class="hint">Serahkan iPad kepada pengguna seterusnya untuk memberikan penilaian baharu.</p>
+    <button class="btn primary" onclick="resetForm()">Penilaian seterusnya ↻</button>
+  </section>
+</div>
+<section class="card hidden" id="admin">
+  <div class="step">Paparan pengurusan</div><div class="question">Ringkasan maklum balas WAPPI</div><div class="hint">Data yang dikumpul disimpan pada pelayar/peranti ini sahaja.</div>
+  <div class="summary" id="summary"></div>
+  <div class="card" style="padding:14px;margin-top:12px">
+    <b>Respons terkini</b><div id="responses" style="overflow-x:auto;margin-top:10px"></div>
+  </div>
+  <div class="adminbar">
+    <button class="btn primary" onclick="exportCSV()">Muat turun CSV</button>
+    <button class="btn secondary" onclick="showSurvey()">Kembali ke skrin penilaian</button>
+    <button class="btn secondary" onclick="clearData()">Padam semua data</button>
+  </div>
+  <p class="small">Simpan fail CSV sebagai rekod dan analisis. Jangan padam data sebelum membuat salinan.</p>
+</section>
+<footer><button class="btn secondary" style="min-height:42px;padding:8px 14px;font-size:13px" onclick="adminAccess()">Guru / Admin: lihat keputusan</button><br>WAPPI • Tugasan SP 2.5.1 &amp; SP 2.5.2</footer>
+<script>
+const answers={type:"Produk WAPPI"};
+let current=0;
+let memoryResponses=[];
+let storageBlocked=false;
+function readResponses(){
+  try { const raw=localStorage.getItem('wappiResponses'); return raw ? JSON.parse(raw) : memoryResponses.slice(); }
+  catch(e){ storageBlocked=true; return memoryResponses.slice(); }
+}
+function writeResponses(data){
+  memoryResponses=data.slice();
+  try { localStorage.setItem('wappiResponses',JSON.stringify(data)); storageBlocked=false; return true; }
+  catch(e){ storageBlocked=true; return false; }
+}
+function bindChoices(){
+ document.querySelectorAll('[data-key]').forEach(group=>{
+   group.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
+     group.querySelectorAll('button').forEach(b=>b.classList.remove('selected'));
+     btn.classList.add('selected'); answers[group.dataset.key]=btn.dataset.val;
+   }));
+ });
+ document.querySelectorAll('#typeOpts button').forEach(btn=>btn.addEventListener('click',()=>{
+   document.querySelectorAll('#typeOpts button').forEach(b=>b.classList.remove('selected'));
+   btn.classList.add('selected'); answers.type=btn.dataset.val;
+ }));
+}
+function go(n){
+ if(n===2&&!answers.overall){alert('Sila pilih penilaian keseluruhan dahulu.');return}
+ if(n===3&&!answers.promo){alert('Sila pilih jawapan tentang bahan promosi.');return}
+ if(n===4&&!answers.favourite){alert('Sila pilih aspek yang paling disukai.');return}
+ if(n===5&&!answers.buy){alert('Sila pilih jawapan minat membeli.');return}
+ current=n;
+ for(let i=0;i<=5;i++)document.getElementById('step'+i).classList.toggle('hidden',i!==n);
+ document.getElementById('thanks').classList.add('hidden');
+ document.getElementById('progress').style.width=(n===0?0:n/5*100)+'%';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function getData(){return readResponses()}
+function submitSurvey(){
+ const data=getData();
+ data.push({tarikh:new Date().toLocaleString('ms-MY'),jenis:answers.type||'',penilaian:answers.overall||'',promosi:answers.promo||'',disukai:answers.favourite||'',minat_membeli:answers.buy||'',cadangan:document.getElementById('suggestion').value.trim()});
+ const saved=writeResponses(data);
+ for(let i=0;i<=5;i++)document.getElementById('step'+i).classList.add('hidden');
+ document.getElementById('thanks').classList.remove('hidden');
+ document.getElementById('progress').style.width='100%';
+ const note=document.querySelector('#thanks .hint');
+ if(note){
+   note.textContent=saved
+    ? 'Respons disimpan pada pelayar/peranti ini. Untuk keselamatan, eksport CSV secara berkala.'
+    : 'Respons direkodkan sementara dalam sesi ini sahaja kerana storan pelayar disekat. Eksport CSV sebelum menutup atau memuat semula halaman.';
+ }
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetForm(){
+ Object.keys(answers).forEach(k=>delete answers[k]);answers.type='Produk WAPPI';
+ document.querySelectorAll('.selected').forEach(b=>b.classList.remove('selected'));
+ document.querySelector('#typeOpts button').classList.add('selected');
+ document.getElementById('suggestion').value='';
+ document.getElementById('survey').classList.remove('hidden');document.getElementById('admin').classList.add('hidden');go(0);
+}
+function adminAccess(){
+ const code=prompt('Masukkan kod guru untuk membuka keputusan:');
+ if(code!=='2580'){if(code!==null)alert('Kod tidak tepat.');return}
+ document.getElementById('survey').classList.add('hidden');document.getElementById('admin').classList.remove('hidden');renderAdmin();window.scrollTo({top:0,behavior:'smooth'});
+}
+function showSurvey(){document.getElementById('admin').classList.add('hidden');document.getElementById('survey').classList.remove('hidden');resetForm()}
+function renderAdmin(){
+ const d=getData(), count=d.length;
+ const avg=count?(d.reduce((s,x)=>s+(Number(x.penilaian)||0),0)/count).toFixed(1):'—';
+ const yes=d.filter(x=>x.minat_membeli==='Ya').length;
+ document.getElementById('summary').innerHTML=`<div class="stat"><span>Jumlah respons</span><b>${count}</b></div><div class="stat"><span>Purata penilaian / 5</span><b>${avg}</b></div><div class="stat"><span>Berminat membeli: Ya</span><b>${yes}</b></div><div class="stat"><span>Cadangan diterima</span><b>${d.filter(x=>x.cadangan).length}</b></div>`;
+ if(!count){document.getElementById('responses').innerHTML='<p>Belum ada respons.</p>';return}
+ let h='<table style="width:100%;border-collapse:collapse;font-size:12px"><tr>'+['Tarikh','Jenis','Nilai','Promosi','Disukai','Membeli','Cadangan'].map(x=>`<th style="background:#7d1028;color:white;padding:7px;text-align:left">${x}</th>`).join('')+'</tr>';
+ d.slice().reverse().forEach(x=>{h+='<tr>'+[x.tarikh,x.jenis,x.penilaian,x.promosi,x.disukai,x.minat_membeli,x.cadangan].map(v=>`<td style="border-bottom:1px solid #ddd;padding:7px">${escapeHtml(v||'')}</td>`).join('')+'</tr>'});h+='</table>';
+ document.getElementById('responses').innerHTML=h;
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function exportCSV(){
+ const d=getData();if(!d.length){alert('Belum ada data untuk dimuat turun.');return}
+ const cols=['tarikh','jenis','penilaian','promosi','disukai','minat_membeli','cadangan'];
+ const csv=[cols.join(','),...d.map(row=>cols.map(k=>'"'+String(row[k]||'').replace(/"/g,'""')+'"').join(','))].join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='WAPPI_Maklum_Balas.csv';a.click();URL.revokeObjectURL(url);
+}
+function clearData(){if(confirm('Padam semua respons pada peranti ini? Tindakan ini tidak boleh dibatalkan.')){memoryResponses=[];try{localStorage.removeItem('wappiResponses')}catch(e){}renderAdmin()}}
+bindChoices();go(0);
+</script>
+</body></html>
